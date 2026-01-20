@@ -24,13 +24,14 @@
 // Equipo: Composición completa del la plantilla
 
 
-require_once '../models/Usuario.php';
-require_once '../models/Jugador.php';
-require_once '../models/Delantero.php';
-require_once '../models/Centrocampista.php';
-require_once '../models/Defensa.php';
-require_once '../models/Entrenador.php';
-require_once '../models/Equipo.php';
+require_once __DIR__ . '/../app/models/Usuario.php';
+require_once __DIR__ . '/../app/models/Jugador.php';
+require_once __DIR__ . '/../app/models/Delantero.php';
+require_once __DIR__ . '/../app/models/Centrocampista.php';
+require_once __DIR__ . '/../app/models/Defensa.php';
+require_once __DIR__ . '/../app/models/Entrenador.php';
+require_once __DIR__ . '/../app/models/Equipo.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
