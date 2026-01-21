@@ -4,15 +4,15 @@ class Entrenador{
     private string $nombre;
     private int $edad;
     private float $sueldo;
-    private int $añosExperiencia;
+    private int $anosExperiencia;
     private  array $titulos;
 
-    public function __construct(string $nombre , int $edad , float $sueldo , int $añosExperiencia ) {
+    public function __construct(string $nombre , int $edad , float $sueldo , int $anosExperiencia ) {
 
 		$this->nombre = $nombre;
         $this->edad = $edad;
         $this->sueldo = $sueldo;
-        $this->añosExperiencia = $añosExperiencia;
+        $this->anosExperiencia = $anosExperiencia;
         $this->titulos = [];
         
 	}
@@ -22,7 +22,7 @@ class Entrenador{
 
    // Añadir un titulo al array
 
-    public function añadirTitulo(string $titulo):void{
+    public function anadirTitulo(string $titulo):void{
         $this->titulos[] = $titulo;
     }
 
@@ -71,7 +71,7 @@ class Entrenador{
 
     public function calcularBonus():float{
 
-        return $this->añosExperiencia * 5000;
+        return $this->anosExperiencia * 5000;
     }
 
     public function calcularSueldoTotal():float{
@@ -90,7 +90,7 @@ class Entrenador{
 
     public function __toString(): string
     {
-        return "Entrenador: {$this->nombre} - Edad: {$this->edad} - Experiencia: {$this->añosExperiencia} años - Sueldo: {$this->sueldo}€"; // ✅ SÍ lleva return
+        return "Entrenador: {$this->nombre} - Edad: {$this->edad} - Experiencia: {$this->anosExperiencia} años - Sueldo: {$this->sueldo}€"; // ✅ SÍ lleva return
     }
 
 
@@ -162,9 +162,9 @@ class Entrenador{
     /**
      * Get the value of añosExperiencia
      */ 
-    public function getAñosExperiencia()
+    public function getAnosExperiencia()
     {
-        return $this->añosExperiencia;
+        return $this->anosExperiencia;
     }
 
     /**
@@ -172,9 +172,9 @@ class Entrenador{
      *
      * @return  self
      */ 
-    public function setAñosExperiencia($añosExperiencia)
+    public function setAnosExperiencia($anosExperiencia)
     {
-        $this->añosExperiencia = $añosExperiencia;
+        $this->anosExperiencia = $anosExperiencia;
 
         return $this;
     }

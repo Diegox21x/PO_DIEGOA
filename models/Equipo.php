@@ -26,7 +26,7 @@ class Equipo
     /**
      * Añade un jugador al array del equipo
      */
-    public function añadirJugador(Jugador $jugador): void
+    public function anadirJugador(Jugador $jugador): void
     {
         $this->jugadores[] = $jugador;
     }

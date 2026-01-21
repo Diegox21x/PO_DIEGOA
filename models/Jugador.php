@@ -27,7 +27,7 @@ abstract class Jugador {
     abstract public function calcularRendimiento(): float;
 
     //añade una lesion
-    public function añadirLesion(string $lesion):void{
+    public function anadirLesion(string $lesion):void{
          $this->lesiones[] = $lesion;
     }
 

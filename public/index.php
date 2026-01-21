@@ -24,13 +24,13 @@
 // Equipo: Composición completa del la plantilla
 
 
-require_once __DIR__ . '/../app/models/Usuario.php';
-require_once __DIR__ . '/../app/models/Jugador.php';
-require_once __DIR__ . '/../app/models/Delantero.php';
-require_once __DIR__ . '/../app/models/Centrocampista.php';
-require_once __DIR__ . '/../app/models/Defensa.php';
-require_once __DIR__ . '/../app/models/Entrenador.php';
-require_once __DIR__ . '/../app/models/Equipo.php';
+require_once __DIR__ . '/../models/Usuario.php';
+require_once __DIR__ . '/../models/Jugador.php';
+require_once __DIR__ . '/../models/Delantero.php';
+require_once __DIR__ . '/../models/Centrocampista.php';
+require_once __DIR__ . '/../models/Defensa.php';
+require_once __DIR__ . '/../models/Entrenador.php';
+require_once __DIR__ . '/../models/Equipo.php';
 
 ?>
 <!DOCTYPE html>
@@ -58,8 +58,8 @@ require_once __DIR__ . '/../app/models/Equipo.php';
     <h2>Entrenador</h2>
     <?php
     $ancelotti = new Entrenador("Carlo Ancelotti", 64, 800000, 25);
-    $ancelotti->añadirTitulo("Champions League 2022");
-    $ancelotti->añadirTitulo("Liga Española 2022");
+    $ancelotti->anadirTitulo("Champions League 2022");
+    $ancelotti->anadirTitulo("Liga Española 2022");
     
     echo "<p>" . $ancelotti . "</p>";
     echo "<p>Bonus: " . $ancelotti->calcularBonus() . "€</p>";
@@ -80,7 +80,7 @@ require_once __DIR__ . '/../app/models/Equipo.php';
         echo "<p>Rendimiento: " . $jugador->calcularRendimiento() . "</p>";
         echo "<p>Sueldo con bonus: " . $jugador->calcularSueldoConBonus() . "€</p>";
         
-        $jugador->añadirLesion("Lesión leve");
+        $jugador->anadirLesion("Lesión leve");
         echo "<p>Lesiones: " . implode(", ", $jugador->obtenerLesiones()) . "</p><br>";
     }
     ?>
@@ -90,7 +90,7 @@ require_once __DIR__ . '/../app/models/Equipo.php';
     $realMadrid = new Equipo("Real Madrid", $ancelotti);
     
     foreach ($jugadores as $jugador) {
-        $realMadrid->añadirJugador($jugador);
+        $realMadrid->anadirJugador($jugador);
     }
     
     echo "<p>" . $realMadrid . "</p>";
