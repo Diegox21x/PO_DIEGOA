@@ -7,6 +7,7 @@
 class Usuario{
 
     //atributos privados(datsos protegidos)
+    private ?int $id;
     private string $nombre;
     private string $email;
     private string $contraseña;
@@ -15,11 +16,20 @@ class Usuario{
 
     
 
-    public function __construct(string $nombre , string $email , string $contraseña , $fechadeRegistro , bool $esSocio){
+    public function __construct(
+        string $nombre,
+        string $email,
+        string $contraseña,
+        $fechadeRegistro,
+        bool $esSocio,
+        bool $passwordHashed = false,
+        ?int $id = null
+    ){
 
+        $this->id = $id;
         $this->nombre = $nombre;
         $this->email = $email;
-        $this->contraseña = password_hash($contraseña, PASSWORD_DEFAULT);
+        $this->contraseña = $passwordHashed ? $contraseña : password_hash($contraseña, PASSWORD_DEFAULT);
         $this->fechadeRegistro = $fechadeRegistro;
         $this->esSocio = $esSocio;
         
@@ -30,9 +40,13 @@ class Usuario{
 
     }
 
+
 	
     //--------------------------------------------------------------
-     //------------------------------METODOS-----------------------
+     //------------------------------METODOS-----------------------/**
+     /**    
+     * Verifica si la contraseña introducida coincide con la almacenada.
+         */
         public function verificarContraseña(string $contraseñIntroducida):bool{
 
             return password_verify($contraseñIntroducida, $this->contraseña);
@@ -42,6 +56,9 @@ class Usuario{
 
     // password_verify compara la contraseña introducida.
 
+        /**
+         * Genera un nombre de usuario básico a partir del email.
+         */
         public static function generarUsuario(string $email):string
         {
             $parteUsuario = explode('@' , $email)[0];
@@ -51,6 +68,9 @@ class Usuario{
         }
 
 
+        /**
+         * Calcula la antigüedad del usuario en días.
+         */
         public function calcularAntiguedad(): int{
              $fechadeRegistro = new DateTime($this->fechadeRegistro);
              $fechaActual = new DateTime();
@@ -58,16 +78,15 @@ class Usuario{
              return abs($diferencia->days);
         }
 
-
+        /**
+         * Representación en texto del usuario.
+         */
         public function __toString():string{
             $tipos = $this->esSocio ? "Es socio del Real Madrid" : "Aficionado";
             
             return  "Ususario: {$this->nombre} ({$this->email}) - {$tipos}- {$this->fechadeRegistro}";
 
         }
-
-
-
 
      //--------------------------------------------------------------
 
@@ -169,6 +188,26 @@ class Usuario{
     public function setEsSocio($esSocio)
     {
         $this->esSocio = $esSocio;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of id
+     */ 
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set the value of id
+     *
+     * @return  self
+     */ 
+    public function setId($id)
+    {
+        $this->id = $id;
 
         return $this;
     }

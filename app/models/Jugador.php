@@ -10,7 +10,7 @@ abstract class Jugador {
 
     
 
-    function __construct(string $nombre, int $edad, string $posicion, float $sueldo, ) {
+    public function __construct(string $nombre, int $edad, string $posicion, float $sueldo ) {
     	$this->nombre = $nombre;
     	$this->edad = $edad;
     	$this->posicion = $posicion;

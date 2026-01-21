@@ -1,120 +1,163 @@
 <?php
-
-// REAL MADRID FAN CLUB - PLATAFORMA DE GESTIÓN
-// 
-// TEMÁTICA: Sistema web para gestión del Real Madrid CF
-// 
-// DESCRIPCIÓN:
-// Plataforma que permite a aficionados registrarse y acceder
-// a información exclusiva del equipo. Combina funciones de
-// red social deportiva con gestión técnica del club.
-// 
-// FUNCIONALIDADES:
-// - Registro e inicio de sesión de aficionados
-// - Gestión de jugadores por posiciones específicas
-// - Cálculo de rendimiento y estadísticas
-// - Control de nóminas y bonuses
-// - Seguimiento de lesiones y títulos
-// 
-// ESTRUCTURA DE CLASES:
-// Usuario: Gestión de aficionados y socios
-// Jugador: Clase abstracta base para especializaciones  
-// Delantero, Centrocampista, Defensa: Posiciones específicas
-// Entrenador: Gestión del cuerpo técnico
-// Equipo: Composición completa del la plantilla
+session_start();
 
 
-require_once __DIR__ . '/../models/Usuario.php';
-require_once __DIR__ . '/../models/Jugador.php';
-require_once __DIR__ . '/../models/Delantero.php';
-require_once __DIR__ . '/../models/Centrocampista.php';
-require_once __DIR__ . '/../models/Defensa.php';
-require_once __DIR__ . '/../models/Entrenador.php';
-require_once __DIR__ . '/../models/Equipo.php';
+include $_SERVER ['DOCUMENT_ROOT'] . '/app/repositories/UsuarioRepository.php';
+include $_SERVER ['DOCUMENT_ROOT'] . '/app/repositories/DelanteroRepository.php';
+include $_SERVER ['DOCUMENT_ROOT'] . '/app/models/Jugador.php';
+include $_SERVER ['DOCUMENT_ROOT'] . '/app/models/Delantero.php';
 
+$usuarioRepo = new UsuarioRepository();
+$delanteroRepo = new DelanteroRepository();
+
+/**
+ * Redirige a la ruta indicada y termina el script.
+ */
+function redirigir(string $ruta): void
+{
+    header('Location: ' . $ruta);
+    exit;
+}
+
+/**
+ * Elimina la cookie de recordar sesión si existe.
+ */
+function limpiarCookieRecuerdo(): void
+{
+    if (isset($_COOKIE['remember_me'])) {
+        setcookie('remember_me', '', time() - 3600, '/');
+        unset($_COOKIE['remember_me']);
+    }
+}
+
+$usuarioSesion = $_SESSION['usuario'] ?? null;
+
+if (!$usuarioSesion && isset($_COOKIE['remember_me'])) {
+    $usuarioDesdeCookie = $usuarioRepo->buscarPorId((int) $_COOKIE['remember_me']);
+    if ($usuarioDesdeCookie) {
+        $_SESSION['usuario'] = [
+            'id' => $usuarioDesdeCookie->getId(),
+            'nombre' => $usuarioDesdeCookie->getNombre(),
+            'email' => $usuarioDesdeCookie->getEmail(),
+        ];
+        $usuarioSesion = $_SESSION['usuario'];
+    } else {
+        limpiarCookieRecuerdo();
+    }
+}
+
+if (!$usuarioSesion) {
+    redirigir('/login.php');
+}
+
+$erroresCrear = [];
+$erroresEliminar = [];
+$valoresCrear = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $accion = $_POST['action'] ?? '';
+
+    if ($accion === 'crear') {
+        $nombre = trim($_POST['nombre'] ?? '');
+        $edad = (int) ($_POST['edad'] ?? 0);
+        $sueldo = (float) ($_POST['sueldo'] ?? 0);
+        $goles = (int) ($_POST['goles'] ?? 0);
+
+        $valoresCrear = [
+            'nombre' => $nombre,
+            'edad' => (string) $edad,
+            'sueldo' => (string) $sueldo,
+            'goles' => (string) $goles,
+        ];
+
+        if ($nombre === '') {
+            $erroresCrear[] = 'El nombre es obligatorio.';
+        }
+
+        if (!Jugador::esEdadValida($edad)) {
+            $erroresCrear[] = 'La edad debe estar entre 16 y 40 años.';
+        }
+
+        if ($sueldo <= 0) {
+            $erroresCrear[] = 'El sueldo debe ser mayor que 0.';
+        }
+
+        if ($goles < 0) {
+            $erroresCrear[] = 'Los goles no pueden ser negativos.';
+        }
+
+        if (!$erroresCrear) {
+            $delantero = new Delantero($nombre, $edad, $sueldo, $goles);
+            $delanteroRepo->crear($delantero);
+            $_SESSION['flash'] = 'Delantero creado correctamente.';
+            redirigir('/index.php');
+        }
+    }
+
+    if ($accion === 'eliminar') {
+        $delanteroId = (int) ($_POST['delantero_id'] ?? 0);
+        if ($delanteroId <= 0) {
+            $erroresEliminar[] = 'Debes seleccionar un delantero.';
+        } else {
+            $eliminado = $delanteroRepo->eliminarPorId($delanteroId);
+            if ($eliminado) {
+                $_SESSION['flash'] = 'Delantero eliminado correctamente.';
+                redirigir('/index.php');
+            }
+
+            $erroresEliminar[] = 'No se encontró el delantero seleccionado.';
+        }
+    }
+}
+
+$delanteros = $delanteroRepo->obtenerTodos();
+$mensaje = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+
+include $_SERVER ['DOCUMENT_ROOT'] . '/resources/views/layouts/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Real Madrid - POO</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <h1>Real Madrid - Práctica 2 POO</h1>
-    <hr>
+<section>
+    <h2>Bienvenida</h2>
+    <p>Bienvenide, <?= htmlspecialchars($usuarioSesion['nombre']) ?>.</p>
+    <?php if ($mensaje): ?>
+        <p><?= htmlspecialchars($mensaje) ?></p>
+    <?php endif; ?>
+</section>
 
-    <h2>Usuarios</h2>
-    <?php
-    $socio = new Usuario("Carlos Madridista", "carlos@realmadrid.com", "HalaMadrid2024", "2024-01-01", true);
-    $aficionado = new Usuario("Ana García", "ana@email.com", "password123", "2024-01-15", false);
-    
-    echo "<p>" . $socio . "</p>";
-    echo "<p>Username: " . Usuario::generarUsuario("carlos@realmadrid.com") . "</p>";
-    echo "<p>Antigüedad: " . $socio->calcularAntiguedad() . " días</p>";
-    echo "<p>Contraseña correcta: " . ($socio->verificarContraseña("HalaMadrid2024") ? "Sí" : "No") . "</p>";
-    ?>
+<?php
+include $_SERVER ['DOCUMENT_ROOT'] . '/resources/views/components/delantero-form.php';
+include $_SERVER ['DOCUMENT_ROOT'] . '/resources/views/components/delete-delantero-form.php';
+?>
 
-    <h2>Entrenador</h2>
-    <?php
-    $ancelotti = new Entrenador("Carlo Ancelotti", 64, 800000, 25);
-    $ancelotti->anadirTitulo("Champions League 2022");
-    $ancelotti->anadirTitulo("Liga Española 2022");
-    
-    echo "<p>" . $ancelotti . "</p>";
-    echo "<p>Bonus: " . $ancelotti->calcularBonus() . "€</p>";
-    echo "<p>Sueldo total: " . $ancelotti->calcularSueldoTotal() . "€</p>";
-    echo "<p>Títulos: " . implode(", ", $ancelotti->obtenerTitulos()) . "</p>";
-    ?>
-
-    <h2>Jugadores</h2>
-    <?php
-    $benzema = new Delantero("Karim Benzema", 35, 500000, 25);
-    $kroos = new Centrocampista("Toni Kroos", 33, 400000, 15);
-    $alaba = new Defensa("David Alaba", 30, 350000, 8);
-    
-    $jugadores = [$benzema, $kroos, $alaba];
-    
-    foreach ($jugadores as $jugador) {
-        echo "<p>" . $jugador . "</p>";
-        echo "<p>Rendimiento: " . $jugador->calcularRendimiento() . "</p>";
-        echo "<p>Sueldo con bonus: " . $jugador->calcularSueldoConBonus() . "€</p>";
-        
-        $jugador->anadirLesion("Lesión leve");
-        echo "<p>Lesiones: " . implode(", ", $jugador->obtenerLesiones()) . "</p><br>";
-    }
-    ?>
-
-    <h2>Equipo</h2>
-    <?php
-    $realMadrid = new Equipo("Real Madrid", $ancelotti);
-    
-    foreach ($jugadores as $jugador) {
-        $realMadrid->anadirJugador($jugador);
-    }
-    
-    echo "<p>" . $realMadrid . "</p>";
-    echo "<p>Nómina total: " . $realMadrid->calcularNominaTotal() . "€</p>";
-    echo "<p>Edad promedio: " . $realMadrid->calcularEdadPromedio() . " años</p>";
-    echo "<p>Rendimiento promedio: " . $realMadrid->calcularRendimientoPromedio() . "</p>";
-    
-    $encontrado = $realMadrid->buscarJugador("Toni Kroos");
-    echo "<p>Jugador encontrado: " . $encontrado->getNombre() . "</p>";
-    
-    echo "<p>Nombre válido: " . (Equipo::esNombreValido("Real Madrid") ? "Sí" : "No") . "</p>";
-    ?>
-
-    <h2>Array de Objetos</h2>
-    <?php
-    $arrayJugadores = [
-        new Delantero("Vinicius Jr", 23, 300000, 18),
-        new Centrocampista("Luka Modric", 38, 450000, 12),
-        new Defensa("Eder Militao", 25, 280000, 5)
-    ];
-    
-    foreach ($arrayJugadores as $jugador) {
-        echo "<p>" . $jugador->getNombre() . " - " . $jugador->getPosicion() . "</p>";
-    }
-    ?>
-</body>
-</html>
+<section>
+    <h2>Listado de delanteros</h2>
+    <?php if (!$delanteros): ?>
+        <p>No hay delanteros registrados todavía.</p>
+    <?php else: ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Edad</th>
+                    <th>Sueldo</th>
+                    <th>Goles</th>
+                    <th>Rendimiento</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($delanteros as $delantero): ?>
+                    <tr>
+                        <td><?= (int) $delantero->getId() ?></td>
+                        <td><?= htmlspecialchars($delantero->getNombre()) ?></td>
+                        <td><?= (int) $delantero->getEdad() ?></td>
+                        <td><?= number_format($delantero->getSueldo(), 2, ',', '.') ?> €</td>
+                        <td><?= (int) $delantero->getGoles() ?></td>
+                        <td><?= number_format($delantero->calcularRendimiento(), 2, ',', '.') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</section>
+<?php include $_SERVER ['DOCUMENT_ROOT'] . '/resources/views/layouts/footer.php'; ?>
