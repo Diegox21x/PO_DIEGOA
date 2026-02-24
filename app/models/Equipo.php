@@ -1,7 +1,8 @@
 <?php
 
 require_once 'Entrenador.php';
-require_once 'Jugador.php';
+$baseModels = realpath($_SERVER['DOCUMENT_ROOT'] . '/../app/models');
+include_once $baseModels . '/Jugador.php';
 
 //Clase Equipo - Representa un equipo de fútbol
  //Usa COMPOSICIÓN: un equipo tiene un entrenador y varios jugadores
