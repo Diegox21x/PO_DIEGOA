@@ -69,4 +69,4 @@ require_once __DIR__ . '/../resources/views/layouts/header.php';
     <p><?= htmlspecialchars($mensaje) ?></p>
 <?php endif; ?>
 <?php require __DIR__ . '/../resources/views/components/login-form.php'; ?>
-<?php require_once __DIR__ . '/../resources/views/layouts/footer.php'; ?>
+

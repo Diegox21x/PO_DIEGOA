@@ -1,6 +1,7 @@
 <?php
 
-require_once 'Jugador.php';
+$baseModels = realpath($_SERVER['DOCUMENT_ROOT'] . '/../app/models');
+include_once $baseModels . '/Jugador.php';
 
 //Clase FINAL Defensa - Hereda de Jugador
 //Implementa el método abstracto calcularRendimiento()

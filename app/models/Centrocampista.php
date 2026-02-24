@@ -1,6 +1,7 @@
 <?php
 // app/models/Centrocampista.php
-require_once 'Jugador.php';
+$baseModels = realpath($_SERVER['DOCUMENT_ROOT'] . '/../app/models');
+include_once $baseModels . '/Jugador.php';
 
 //Clase FINAL Centrocampista - Hereda de Jugador
  //Implementa el método abstracto calcularRendimiento()
